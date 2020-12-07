@@ -29,3 +29,24 @@ where valid_location(a.location) is null ;
 select ST_Y(ST_GeomFromText(valid_location(a.location)))as Y , ST_X(ST_GeomFromText(valid_location(a.location))) as X from address a
 where valid_location(a.location) is not null ;
 
+
+#2. Найти всех покупателей, проживающих внутри заданного полигона 
+#(например, "POLYGON ((-60 -40,-57.9 -37.3,-57.9 -34.3,-59.1 -34.3,-60 -40))").
+use sakila;
+
+drop procedure if exists area ;
+
+delimiter $$
+create procedure area(pol POLYGON)
+begin
+	select * , ST_AsText(a.location) from address a 
+    where ST_Contains(pol,a.location)=1;
+end$$
+delimiter ;
+
+
+call area( ST_PolygonFromText('POLYGON ((-60 -40,-57.9 -37.3,-57.9 -34.3,-59.1 -34.3,-60 -40))')  );
+
+call area( ST_GeomFromText('POLYGON ((-60 -40,-57.9 -37.3,-57.9 -34.3,-59.1 -34.3,-60 -40))')  );
+
+
