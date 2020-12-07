@@ -66,9 +66,9 @@ begin
 	inner join address a on cr.address_id=a.address_id
 	inner join city on city.city_id=a.address_id
 	inner join country on country.country_id=city.country_id
-	where country.country_id=arg_country
+	where country.country_id=arg_country and valid_location(a.location) is not null
 	limit 1) , rad) , a.location))=1;
 end$$
 delimiter ;
 
-call neighbors(79,100);
+call neighbors(80,15);
