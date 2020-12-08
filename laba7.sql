@@ -76,6 +76,12 @@ call neighbors(80,15);
 
 
 
+
+
+
+#-------------------------------------JSON---------------------------------------------------------------------
+
+
 #6. Создать новую таблицу или изменить существующую, добавив поле типа JSON и заполнить его данными. 
 #Минимум одно из значений записи должно представлять из себя вложенную структуру, одно – массив.
 # Каждая запись должна содержать не менее 5 ключей.
@@ -121,4 +127,34 @@ INSERT INTO dogs  VALUES
 
 SELECT * FROM dogs WHERE person_information->"$.color[0]"="brown" or person_information->"$.color[1]"="brown" or person_information->"$.color[2]"="brown";
 SELECT * FROM dogs WHERE common_information->"$.parents.mather" = common_information->"$.parents.father";
+
+
+
+#8. Выполнить запрос, добавляющие новую пару «ключ-значение» к заданной строке таблицы, причем «значение» является массивом.
+SET SQL_SAFE_UPDATES = 0;
+
+UPDATE dogs 
+SET person_information= JSON_INSERT(person_information,'$.Awards' , JSON_ARRAY('A1','F2','AEA')) 
+WHERE person_information->"$.nickname" = 'chacha';
+
+
+
+
+#9. Выполнить запрос, изменяющий значение некоторого существующего ключа в заданной строке таблицы.
+
+SET SQL_SAFE_UPDATES = 0;
+
+UPDATE dogs
+SET person_information = JSON_REPLACE(person_information, '$.nickname',"new_name") 
+WHERE id_dog = 1;
+
+
+
+#10. Выполнить запрос, осуществляющий удаление созданной пары «ключ-значение».
+SET SQL_SAFE_UPDATES = 0;
+
+UPDATE dogs
+SET person_information=JSON_REMOVE(person_information, "$.Age")
+WHERE id_dog=1;
+
 
