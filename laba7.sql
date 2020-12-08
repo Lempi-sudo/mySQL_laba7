@@ -141,8 +141,65 @@ CALL region( @region);
 select ST_AsText(@region);
 
 
+#5. Определить пространственные соотношения полигонов, полученных в заданиях №3 и №4.
+use sakila;
+
+drop function if exists area_relation;
+
+delimiter //
+CREATE FUNCTION area_relation(from_3 GEOMETRY, from_4 GEOMETRY )
+RETURNS VARCHAR(200) DETERMINISTIC
+BEGIN
+    DECLARE res VARCHAR(200);
+    IF ST_Contains(from_3, from_4)THEN 
+		SET res='region 3 contain region 4, ';
+    END IF;
+    IF ST_Contains(from_4, from_3)THEN
+		SET res='region 4 contain region 3, ';
+    END IF;
+    IF NOT ST_Contains(from_4, from_3) AND NOT ST_Contains(from_3, from_4)THEN 
+		SET res='regions don\'t include in each other, ';
+    END IF;
+    IF ST_Crosses(from_4, from_3) THEN
+		SET res=concat(res,'region 4 crosses region 3, ');
+    ELSEIF ST_Crosses(from_3, from_4) THEN 
+		SET res=concat(res,'region 3 crosses region 4, ');
+    ELSE 
+		SET res=concat(res,'not crosses, ');
+    END IF;
+    IF ST_Touches(from_4, from_3) THEN 
+		SET res=concat(res,'not touches, ');
+    ELSE
+		SET res=concat(res,'touches, ');
+    END IF;
+    IF ST_Disjoint(from_4, from_3)THEN
+		SET res=concat(res,'disjoint!');
+    ELSE
+		SET res=concat(res,'not disjoint!');
+    END IF;
+    RETURN res;
+END//
+delimiter ;
 
 
+use sakila;
+
+select ST_Buffer((select a.location from customer cr
+	inner join address a on cr.address_id=a.address_id
+	inner join city on city.city_id=a.address_id
+	inner join country on country.country_id=city.country_id
+	where country.country_id=19 and valid_location(a.location) is not null
+	limit 1) , 120 ) into @region_from_3;
+    
+    select ST_AsText(@region_from_3);
+    
+    CALL region(@region_from_4);
+
+    select ST_AsText(@region_from_4);
+    
+    
+    
+SELECT area_relation(@region_from_3, @region_from_4);
 
 #-------------------------------------JSON---------------------------------------------------------------------
 
