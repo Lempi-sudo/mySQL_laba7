@@ -72,3 +72,53 @@ end$$
 delimiter ;
 
 call neighbors(80,15);
+
+
+
+
+#6. Создать новую таблицу или изменить существующую, добавив поле типа JSON и заполнить его данными. 
+#Минимум одно из значений записи должно представлять из себя вложенную структуру, одно – массив.
+# Каждая запись должна содержать не менее 5 ключей.
+use football_league;
+
+CREATE TABLE dogs 
+(
+  id_dog INT NOT NULL AUTO_INCREMENT,
+  person_information JSON,
+  common_information JSON,
+CONSTRAINT id_dog PRIMARY KEY (id_dog)
+);
+
+
+INSERT INTO dogs  VALUES
+(
+    null,
+    JSON_OBJECT("nickname" ,"black", "color" , JSON_ARRAY("black") , "Age" , 1 ),
+	'{"breed":"great dane", "parents": {"mather": "great dane", "father": "great dane"} , "price":22250 , "available":true}'
+);
+INSERT INTO dogs  VALUES
+(
+    null,
+    JSON_OBJECT("nickname" ,"baron", "color" , JSON_ARRAY("brown", "grey") , "Age" , 2 ),
+	'{"breed":"Welsh terrier", "parents": {"mather": "Welsh terrier", "father": "Welsh terrier"} , "price":1150 , "available":false}'
+);
+INSERT INTO dogs  VALUES
+(
+    null,
+    JSON_OBJECT("nickname" ,"chacha", "color" , JSON_ARRAY("brown","black") , "Age" ,1 ),
+	'{"breed":"German Shepherd", "parents": {"mather": "German Shepherd", "father": "German Shepherd"} , "price":7000 , "available":true}'
+);
+INSERT INTO dogs  VALUES
+(
+    null,
+    JSON_OBJECT("nickname" ,"Myxtar", "color" , JSON_ARRAY("black" , "brown", "grey") , "Age" , 2 ),
+	'{"breed":"cur", "parents": {"mather": "cur", "father": "cur"} , "price":150 , "available":true}'
+);
+
+
+#7. Выполнить запрос, возвращающий содержимое данной таблицы, соответствующее некоторому условию, проверяющему значение атрибута вложенной 
+#структуры.
+
+SELECT * FROM dogs WHERE person_information->"$.color[0]"="brown" or person_information->"$.color[1]"="brown" or person_information->"$.color[2]"="brown";
+SELECT * FROM dogs WHERE common_information->"$.parents.mather" = common_information->"$.parents.father";
+
